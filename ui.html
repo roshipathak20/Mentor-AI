@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RS timi – Internal Assistant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700;300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+:root {
+  /* Deeper Radiant Red theme */
+  --primary: #DB6164;        /* main red */
+  --primary-soft: #F2A3AA;   /* deeper soft red, less pale */
+  --primary-dark: #9E3A3F;   /* darker for headings, hover */
+
+  --bg: #FFE3E7;             /* slightly stronger background tint */
+  --bg-white: #ffffff;
+
+  --text-main: #1A1A1A;
+  --text-muted: #555555;
+
+  --border: #D88E94;
+
+  --radius-lg: 16px;
+  --radius-md: 8px;
+
+  --shadow-subtle: 0 1px 4px rgba(0,0,0,0.06);
+  --shadow-heavy: 0 4px 20px rgba(0,0,0,0.1);
+
+  --font-serif: "Merriweather", serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+
+  body {
+    background: var(--bg);
+    margin: 0;
+    padding: 30px;
+    font-family: var(--font-sans);
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    color: var(--text-main);
+  }
+
+  .app-frame {
+    background: var(--bg-white);
+    width: 100%;
+    max-width: 1200px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-heavy);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER -------------------------------------------------- */
+  .company-bar {
+    background: var(--primary);
+    padding: 16px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+  }
+  .company-logo {
+    font-family: var(--font-serif);
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+  .company-logo span {
+    display: block;
+    font-size: 0.75rem;
+    color: #FFE2E6;
+  }
+  .user-chip {
+    padding: 6px 12px;
+    border-radius: var(--radius-md);
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  /* TABS ---------------------------------------------------- */
+  .tab-bar {
+    display: flex;
+    background: var(--bg-white);
+    border-bottom: 1px solid var(--border);
+  }
+  .tab-button {
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    border-bottom: 3px solid transparent;
+    font-size: 0.9rem;
+    transition: 0.2s;
+  }
+  .tab-button:hover:not(.active) {
+    color: var(--primary-dark);
+  }
+  .tab-button.active {
+    color: var(--primary);
+    border-bottom: 3px solid var(--primary);
+    background: var(--primary-soft);
+    font-weight: 700;
+  }
+
+  .view {
+    padding: 30px 40px;
+    background: var(--bg-white);
+    flex-grow: 1;
+    position: relative;
+  }
+
+  /* HOME ---------------------------------------------------- */
+  .welcome-box {
+    text-align: center;
+    padding: 70px 30px;
+    background-image: url("RS timi homepage.png");
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    min-height: 420px;
+  }
+  .welcome-box::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+  }
+  .welcome-box > * {
+    position: relative;
+    z-index: 1;
+  }
+  .heading-main {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .heading-sub {
+    font-size: 1rem;
+    color: #ffffff;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+    max-width: 700px;
+    margin: 0 auto 40px;
+  }
+  .btn-primary {
+    background: var(--primary);
+    border: none;
+    padding: 12px 30px;
+    color: #fff;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow-subtle);
+    transition: 0.2s;
+  }
+  .btn-primary:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 4px 12px rgba(219,97,100,0.35);
+  }
+
+  /* INNER SCREEN TITLES ------------------------------------- */
+  .screen-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin: 0 0 10px;
+  }
+  .screen-sub {
+    font-size: 1rem;
+    color: var(--text-main);
+    font-weight: 600;
+    margin: 0 0 30px;
+    text-align: center;
+  }
+
+  /* SEARCH -------------------------------------------------- */
+  .search-box {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+    padding: 12px 18px;
+    box-shadow: var(--shadow-subtle);
+    margin-bottom: 30px;
+    background: #fff;
+  }
+  .search-box input {
+    border: none;
+    flex: 1;
+    font-size: 1rem;
+    background: transparent;
+  }
+  .search-box input::placeholder {
+    color: #555555;
+  }
+
+  /* CARDS --------------------------------------------------- */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: 0.2s;
+    background: #fff;
+  }
+  .card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  }
+  .card-title {
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  /* LISTS (HR, IT, Policies, Settings) ---------------------- */
+  .list {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+  }
+  .list li {
+    background: var(--primary-soft);
+    border-left: 5px solid var(--primary);
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    transition: 0.2s;
+  }
+  .list li:hover {
+    background: #F5C5C7;
+  }
+
+  /* ACCENT IMAGE ON INNER TABS ------------------------------ */
+  #screen-assistant,
+  #screen-hr,
+  #screen-it,
+  #screen-policies,
+  #screen-settings {
+    background-image: url("accent-wave.png");
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: 360px auto; /* change if too big/small */
+  }
+
+  /* FOOTER -------------------------------------------------- */
+  .app-footer {
+    background: #FFE6E7;
+    border-top: 1px solid #E7B8BA;
+    padding: 20px 40px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+  }
+  .footer-section {
+    line-height: 1.8;
+  }
+  .footer-section strong {
+    color: var(--primary-dark);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* FAB GRAPH BUTTON + OVERLAY ------------------------------ */
+  .fab-graph {
+    position: absolute;
+    right: 30px;
+    bottom: 30px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    font-size: 1.4rem;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(219,97,100,0.4);
+    transition: 0.2s;
+  }
+  .fab-graph:hover {
+    background: var(--primary-dark);
+  }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+  }
+  .overlay.active {
+    display: flex;
+  }
+  .overlay-panel {
+    background: #fff;
+    padding: 30px;
+    border-radius: var(--radius-md);
+    max-width: 550px;
+    width: 90%;
+    box-shadow: var(--shadow-heavy);
+    position: relative;
+    border: 1px solid var(--border);
+  }
+  .overlay-close {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    border: none;
+    background: transparent;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: var(--text-muted);
+  }
+  .graph-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin: 0 0 5px;
+  }
+  .graph-sub {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0 0 20px;
+  }
+  .graph-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+  }
+  .graph-row {
+    display: flex;
+    gap: 18px;
+  }
+  .node {
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--primary);
+    background: var(--primary-soft);
+    color: var(--primary-dark);
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .node.main {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  /* SCREEN VISIBILITY --------------------------------------- */
+  .screen {
+    display: none;
+  }
+  .screen.active {
+    display: block;
+  }
+  </style>
+</head>
+
+<body>
+<div class="app-frame">
+
+  <!-- HEADER -->
+  <div class="company-bar">
+    <div class="company-logo">
+      RS timi
+      <span>Internal Knowledge Assistant</span>
+    </div>
+    <div class="user-chip">employee@rstimi.com</div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tab-bar">
+    <button class="tab-button active" data-screen="welcome">Home</button>
+    <button class="tab-button" data-screen="assistant">Assistant</button>
+    <button class="tab-button" data-screen="hr">HR</button>
+    <button class="tab-button" data-screen="it">IT Support</button>
+    <button class="tab-button" data-screen="policies">Policies</button>
+    <button class="tab-button" data-screen="settings">Settings</button>
+  </div>
+
+  <!-- MAIN VIEW -->
+  <div class="view">
+
+    <!-- HOME -->
+    <section class="screen active" id="screen-welcome">
+      <div class="welcome-box">
+        <h1 class="heading-main">Welcome to RS timi Assistant</h1>
+        <p class="heading-sub">
+          Your internal knowledge assistant powered by MentorAI. Quickly find answers about HR, payroll,
+          IT configuration, tax cards and onboarding without searching through emails or documents.
+        </p>
+        <button class="btn-primary" id="btn-start">Start Assistant</button>
+      </div>
+    </section>
+
+    <!-- ASSISTANT -->
+    <section class="screen" id="screen-assistant">
+      <h1 class="screen-title">Ask MentorAI</h1>
+      <p class="screen-sub">Type any work-related question below.</p>
+
+      <div class="search-box">
+        <span style="font-size: 1.2rem;">🔎</span>
+        <input type="text" placeholder="Example: How do I update my tax card?" />
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-title">Update tax card</div>
+          <div>Avoid 60% default tax by submitting the correct form.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Annual leave</div>
+          <div>Learn how to submit a holiday request for approval.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">New employee checklist</div>
+          <div>Tasks and tools needed during your first weeks.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">VPN Access</div>
+          <div>Instructions for secure remote access.</div>
+        </div>
+      </div>
+
+      <button class="fab-graph" id="btn-graph">📊</button>
+    </section>
+
+    <!-- HR -->
+    <section class="screen" id="screen-hr">
+      <h1 class="screen-title">HR Information</h1>
+      <p class="screen-sub" style="text-align:left;">
+        Common questions about RS timi human resources and payroll.
+      </p>
+      <ul class="list">
+        <li>How do I submit my annual leave request?</li>
+        <li>Where can I check my working hours and flex balance?</li>
+        <li>How do I request an employment certificate?</li>
+        <li>Who is my HR contact?</li>
+      </ul>
+    </section>
+
+    <!-- IT -->
+    <section class="screen" id="screen-it">
+      <h1 class="screen-title">IT Support</h1>
+      <p class="screen-sub" style="text-align:left;">
+        Technical help and setup guidance for company systems.
+      </p>
+      <ul class="list">
+        <li>Password reset steps</li>
+        <li>VPN installation and usage</li>
+        <li>Email setup on mobile</li>
+        <li>Request access to internal tools</li>
+      </ul>
+    </section>
+
+    <!-- POLICIES -->
+    <section class="screen" id="screen-policies">
+      <h1 class="screen-title">Policies</h1>
+      <p class="screen-sub" style="text-align:left;">
+        Important company policies in summarized form.
+      </p>
+      <ul class="list">
+        <li>Code of conduct</li>
+        <li>Data protection &amp; privacy</li>
+        <li>Remote work guidelines</li>
+        <li>Health &amp; safety regulations</li>
+      </ul>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="screen" id="screen-settings">
+      <h1 class="screen-title">Settings</h1>
+      <p class="screen-sub" style="text-align:left;">
+        Customize your assistant preferences.
+      </p>
+      <ul class="list">
+        <li>Language: English</li>
+        <li>Notification channel: Email</li>
+      </ul>
+    </section>
+
+    <!-- GRAPH OVERLAY -->
+    <div class="overlay" id="graph-overlay">
+      <div class="overlay-panel">
+        <button class="overlay-close" id="overlay-close">✕</button>
+        <h2 class="graph-title">Knowledge Graph: Update Tax Card</h2>
+        <p class="graph-sub">Process flow for updating your payroll information.</p>
+
+        <div class="graph-rows">
+          <div class="node main">Employee Action</div>
+          <div class="graph-row">
+            <div class="node">Log into Tax Office Portal</div>
+          </div>
+          <div class="graph-row">
+            <div class="node">Fill in new tax card data</div>
+          </div>
+          <div class="graph-row">
+            <div class="node">Tax Office sends data</div>
+            <div class="node">RS timi Payroll System</div>
+          </div>
+          <div class="graph-row">
+            <div class="node">HR review &amp; approval</div>
+          </div>
+          <div class="graph-row">
+            <div class="node main">Updated salary slip</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <div class="footer-section">
+      <strong>RS timi GmbH Headquarters</strong>
+      Leopoldstraße 234<br>
+      80807 München, Deutschland
+    </div>
+    <div class="footer-section">
+      <strong>Service &amp; Contact</strong>
+      Customer Support: +49 89 1234 5678<br>
+      Internal IT Support: Extension 101<br>
+      HR Department: hr@rstimi.com
+    </div>
+    <div class="footer-section">
+      <strong>Legal</strong>
+      © 2025 RS timi GmbH.<br>
+      All Rights Reserved.
+    </div>
+  </footer>
+
+</div>
+
+<script>
+const tabButtons = document.querySelectorAll(".tab-button");
+const screens = document.querySelectorAll(".screen");
+const fabGraph = document.getElementById("btn-graph");
+const graphOverlay = document.getElementById("graph-overlay");
+const overlayClose = document.getElementById("overlay-close");
+
+/* TAB SWITCHING */
+tabButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    tabButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const target = "screen-" + btn.dataset.screen;
+    screens.forEach(s => s.classList.remove("active"));
+    document.getElementById(target).classList.add("active");
+
+    // show graph button only on Assistant tab
+    fabGraph.style.display = (btn.dataset.screen === "assistant") ? "flex" : "none";
+  });
+});
+
+/* HOME → ASSISTANT */
+document.getElementById("btn-start").addEventListener("click", () => {
+  document.querySelector('.tab-button[data-screen="assistant"]').click();
+});
+
+/* GRAPH OVERLAY */
+fabGraph.addEventListener("click", () => {
+  graphOverlay.classList.add("active");
+});
+overlayClose.addEventListener("click", () => {
+  graphOverlay.classList.remove("active");
+});
+</script>
+
+</body>
+</html>
